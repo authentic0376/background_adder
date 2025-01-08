@@ -38,9 +38,6 @@ class FileDropHandler extends TransferHandler {
                         targetWidth = (int) (panelHeight * imageAspectRatio);
                     }
 
-                    int x = (panelWidth - targetWidth) / 2;
-                    int y = (panelHeight - targetHeight) / 2;
-
                     originalPreview.setText(null);
                     processedPreview.setText(null);
                     originalPreview.setIcon(new ImageIcon(original.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH)));
