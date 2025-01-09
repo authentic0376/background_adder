@@ -20,34 +20,14 @@ class FileProcessor {
     }
 
     public BufferedImage addWhiteBackground(BufferedImage image) {
-        BufferedImage newImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        int width = image.getWidth();
+        int height = image.getHeight();
+        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g = newImage.createGraphics();
         g.setColor(Color.WHITE);
-        g.fillRect(0, 0, newImage.getWidth(), newImage.getHeight());
+        g.fillRect(0, 0, width, height);
 
-        int imageWidth = image.getWidth();
-        int imageHeight = image.getHeight();
-        double imageAspectRatio = (double) imageWidth / imageHeight;
-
-        int panelWidth = newImage.getWidth();
-        int panelHeight = newImage.getHeight();
-        double panelAspectRatio = (double) panelWidth / panelHeight;
-
-        int targetWidth;
-        int targetHeight;
-
-        if (imageAspectRatio > panelAspectRatio) {
-            targetWidth = panelWidth;
-            targetHeight = (int) (panelWidth / imageAspectRatio);
-        } else {
-            targetHeight = panelHeight;
-            targetWidth = (int) (panelHeight * imageAspectRatio);
-        }
-
-        int x = (panelWidth - targetWidth) / 2;
-        int y = (panelHeight - targetHeight) / 2;
-
-        g.drawImage(image, x, y, targetWidth, targetHeight, null);
+        g.drawImage(image, 0, 0, width, height, null);
         g.dispose();
         return newImage;
     }
