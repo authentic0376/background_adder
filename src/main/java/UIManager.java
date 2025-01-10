@@ -1,5 +1,4 @@
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
 class UIManager {
 
@@ -64,7 +63,6 @@ class UIManager {
 
     private void initOriginalPreview() {
         originalPreview = new JLabel("Original Image Preview", JLabel.CENTER);
-        originalPreview.setBorder(new LineBorder(Color.RED, 2)); // 빨간색, 두께 2px
         originalPreview.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
