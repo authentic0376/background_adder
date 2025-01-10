@@ -3,7 +3,7 @@ plugins {
 }
 
 group = "com.sprain6628"
-version = "1.0-SNAPSHOT"
+version = "v0.1.0"
 
 repositories {
     mavenCentral()
