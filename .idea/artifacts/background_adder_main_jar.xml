@@ -1,9 +1,0 @@
-<component name="ArtifactManager">
-  <artifact type="jar" name="background_adder.main:jar">
-    <output-path>$PROJECT_DIR$/out/artifacts/background_adder_main_jar</output-path>
-    <root id="archive" name="background_adder.main.jar">
-      <element id="module-output" name="background_adder.main" />
-      <element id="dir-copy" path="$PROJECT_DIR$/src/main/resources" />
-    </root>
-  </artifact>
-</component>
