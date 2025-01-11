@@ -1,6 +1,7 @@
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 import java.awt.*;
+import java.util.Objects;
+
 class UIManager {
 
     private JLabel processedPreview;
@@ -64,7 +65,6 @@ class UIManager {
 
     private void initOriginalPreview() {
         originalPreview = new JLabel("Original Image Preview", JLabel.CENTER);
-        originalPreview.setBorder(new LineBorder(Color.RED, 2)); // 빨간색, 두께 2px
         originalPreview.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
@@ -91,6 +91,14 @@ class UIManager {
         frame = new JFrame("Image Background Adder");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
+
+        setIcon();
+    }
+
+    private void setIcon() {
+        ImageIcon icon = new ImageIcon(Objects.requireNonNull(UIManager.class.getResource("background adder.png")));
+        Image img = icon.getImage().getScaledInstance(128, 128, Image.SCALE_SMOOTH);
+        frame.setIconImage(img);
     }
 
     private JPanel createPreviewPanel(String title) {
