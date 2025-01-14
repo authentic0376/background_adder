@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Objects;
 
 class UIManager {
@@ -15,12 +16,12 @@ class UIManager {
     private JSplitPane splitPane;
 
     public void initialize() {
-        initComponents(); // 컴포넌트 생성 및 레이아웃 설정
+        initComponents();
         assembleComponents();
 
         fileProcessor = new FileProcessor();
         saveButton.addActionListener(e -> fileProcessor.saveProcessedImage(processedPreview));
-        new FileDropHandler(leftPanel, fileProcessor, originalPreview, processedPreview);
+        new FileDropHandler(this, fileProcessor);
 
         finalFrameSetting();
     }
@@ -34,6 +35,38 @@ class UIManager {
         initProcessedPreview();
         initSaveButton();
         initSplitPane();
+    }
+
+    public void updatePreviewImages() {
+        BufferedImage original = fileProcessor.getOriginalImage();
+        ImageIcon originalIcon = scaleImageToLabel(original, originalPreview);
+        originalPreview.setIcon(originalIcon);
+        originalPreview.setText(null);
+
+        BufferedImage processed = fileProcessor.getProcessedImage();
+        ImageIcon processedIcon = scaleImageToLabel(processed, processedPreview);
+        processedPreview.setIcon(processedIcon);
+        processedPreview.setText(null);
+    }
+
+    private ImageIcon scaleImageToLabel(BufferedImage image, JLabel label) {
+        double imageAspectRatio = (double) image.getWidth() / image.getHeight();
+        int panelWidth = label.getWidth();
+        int panelHeight = label.getHeight();
+        double panelAspectRatio = (double) panelWidth / panelHeight;
+
+        int targetWidth;
+        int targetHeight;
+
+        if (imageAspectRatio > panelAspectRatio) {
+            targetWidth = panelWidth;
+            targetHeight = (int) (panelWidth / imageAspectRatio);
+        } else {
+            targetHeight = panelHeight;
+            targetWidth = (int) (panelHeight * imageAspectRatio);
+        }
+
+        return new ImageIcon(image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH));
     }
 
     private void initSaveButton() {
@@ -124,5 +157,41 @@ class UIManager {
             }
         };
         return jPanel;
+    }
+
+    public JLabel getProcessedPreview() {
+        return processedPreview;
+    }
+
+    public FileProcessor getFileProcessor() {
+        return fileProcessor;
+    }
+
+    public JFrame getFrame() {
+        return frame;
+    }
+
+    public JPanel getLeftPanel() {
+        return leftPanel;
+    }
+
+    public JLabel getOriginalPreview() {
+        return originalPreview;
+    }
+
+    public JPanel getRightPanel() {
+        return rightPanel;
+    }
+
+    public JPanel getCheckerboard() {
+        return checkerboard;
+    }
+
+    public JButton getSaveButton() {
+        return saveButton;
+    }
+
+    public JSplitPane getSplitPane() {
+        return splitPane;
     }
 }
