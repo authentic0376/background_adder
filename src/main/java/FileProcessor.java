@@ -1,44 +1,32 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Map;
 
 class FileProcessor {
 
     private BufferedImage originalImage;
     private BufferedImage processedImage;
+    private FileHandlerStrategy strategy;
+
+    private final Map<String, FileHandlerStrategy> strategyMap;
+
+    public FileProcessor(Map<String, FileHandlerStrategy> strategyMap) {
+        this.strategyMap = strategyMap;
+    }
 
     public void processFile(File file) throws IOException {
-        validateFileExtension(file);
-        originalImage = ImageIO.read(file);
-        processedImage = createImageWithWhiteBackground(originalImage);
-    }
-
-    private void validateFileExtension(File file) {
         String extension = getFileExtension(file);
-        if (!extension.equals("png") && !extension.equals("svg")) {
+        strategy = strategyMap.get(extension);
+
+        if (strategy == null) {
             throw new IllegalArgumentException("Unsupported file type: " + extension);
         }
+        originalImage = strategy.readImage(file);
+        processedImage = strategy.addWhiteBackground(originalImage);
     }
 
-    private BufferedImage createImageWithWhiteBackground(BufferedImage image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g = newImage.createGraphics();
-        try {
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, width, height);
-            g.drawImage(image, 0, 0, width, height, null);
-        } finally {
-            g.dispose();
-        }
-
-        return newImage;
-    }
 
     public void saveProcessedImage(JLabel previewLabel) {
         if (processedImage == null) {
@@ -51,7 +39,7 @@ class FileProcessor {
             String downloadFolder = userHome + File.separator + "Downloads";
             File outputFile = new File(downloadFolder, "processed_image.png");
 
-            ImageIO.write(processedImage, "png", outputFile);
+            strategy.write(outputFile);
             JOptionPane.showMessageDialog(previewLabel, "Image saved successfully to " + outputFile.getAbsolutePath());
         } catch (IOException e) {
             JOptionPane.showMessageDialog(previewLabel, "Error saving image: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);

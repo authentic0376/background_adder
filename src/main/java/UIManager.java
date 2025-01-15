@@ -1,6 +1,8 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 class UIManager {
@@ -19,7 +21,10 @@ class UIManager {
         initComponents();
         assembleComponents();
 
-        fileProcessor = new FileProcessor();
+        Map<String, FileHandlerStrategy> handlers = new HashMap<>();
+        handlers.put("png", new PngHandler());
+        fileProcessor = new FileProcessor(handlers);
+
         saveButton.addActionListener(e -> fileProcessor.saveProcessedImage(processedPreview));
         new FileDropHandler(this, fileProcessor);
 
