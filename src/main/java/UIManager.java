@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -16,17 +15,23 @@ class UIManager {
     private JPanel checkerboard;
     private JButton saveButton;
     private JSplitPane splitPane;
+    private Map<String, UpdatePreviewStrategy> updatePreviewHandlers;
 
     public void initialize() {
         initComponents();
         assembleComponents();
 
-        Map<String, FileHandlerStrategy> handlers = new HashMap<>();
-        handlers.put("png", new PngHandler());
-        fileProcessor = new FileProcessor(handlers);
+        Map<String, FileHandlerStrategy> fileHandlers = new HashMap<>();
+        fileHandlers.put("png", new PngHandler());
+
+        fileProcessor = new FileProcessor(fileHandlers);
 
         saveButton.addActionListener(e -> fileProcessor.saveProcessedImage(processedPreview));
         new FileDropHandler(this, fileProcessor);
+
+
+        updatePreviewHandlers = new HashMap<>();
+        updatePreviewHandlers.put("png", new PngPreviewHandler());
 
         finalFrameSetting();
     }
@@ -43,35 +48,8 @@ class UIManager {
     }
 
     public void updatePreviewImages() {
-        BufferedImage original = fileProcessor.getOriginalImage();
-        ImageIcon originalIcon = scaleImageToLabel(original, originalPreview);
-        originalPreview.setIcon(originalIcon);
-        originalPreview.setText(null);
-
-        BufferedImage processed = fileProcessor.getProcessedImage();
-        ImageIcon processedIcon = scaleImageToLabel(processed, processedPreview);
-        processedPreview.setIcon(processedIcon);
-        processedPreview.setText(null);
-    }
-
-    private ImageIcon scaleImageToLabel(BufferedImage image, JLabel label) {
-        double imageAspectRatio = (double) image.getWidth() / image.getHeight();
-        int panelWidth = label.getWidth();
-        int panelHeight = label.getHeight();
-        double panelAspectRatio = (double) panelWidth / panelHeight;
-
-        int targetWidth;
-        int targetHeight;
-
-        if (imageAspectRatio > panelAspectRatio) {
-            targetWidth = panelWidth;
-            targetHeight = (int) (panelWidth / imageAspectRatio);
-        } else {
-            targetHeight = panelHeight;
-            targetWidth = (int) (panelHeight * imageAspectRatio);
-        }
-
-        return new ImageIcon(image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH));
+        UpdatePreviewStrategy strategy = updatePreviewHandlers.get(fileProcessor.getExtension());
+        strategy.updatePreviewImages(fileProcessor, this);
     }
 
     private void initSaveButton() {

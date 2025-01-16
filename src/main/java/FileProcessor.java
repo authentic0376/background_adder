@@ -9,6 +9,11 @@ class FileProcessor {
     private BufferedImage originalImage;
     private BufferedImage processedImage;
     private FileHandlerStrategy strategy;
+    private String extension;
+
+    public String getExtension() {
+        return extension;
+    }
 
     private final Map<String, FileHandlerStrategy> strategyMap;
 
@@ -51,7 +56,8 @@ class FileProcessor {
         if (hasExtension(name)) {
             throw new IllegalArgumentException("File does not have a valid extension: " + name);
         }
-        return _getFileExtension(name);
+        extension = _getFileExtension(name);
+        return extension;
     }
 
     private boolean hasExtension(String name) {
