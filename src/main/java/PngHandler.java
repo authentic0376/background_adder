@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class PngHandler implements FileHandlerStrategy {
+class PngHandler implements FileHandlerStrategy {
 
     private BufferedImage processedImage;
 
