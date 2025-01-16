@@ -5,10 +5,13 @@ import java.io.File;
 import java.io.IOException;
 
 class PngHandler implements FileHandlerStrategy {
-
-    private BufferedImage processedImage;
-
     @Override
+    public Object[] processFile(File file) throws IOException {
+        BufferedImage originalImage = readImage(file);
+        BufferedImage processedImage = addWhiteBackground(originalImage);
+        return new BufferedImage[]{originalImage, processedImage};
+    }
+
     public BufferedImage addWhiteBackground(BufferedImage originalImage) {
         int width = originalImage.getWidth();
         int height = originalImage.getHeight();
@@ -22,19 +25,16 @@ class PngHandler implements FileHandlerStrategy {
         } finally {
             g.dispose();
         }
-
-        processedImage = newImage;
         return newImage;
     }
 
-    @Override
     public BufferedImage readImage(File file) throws IOException {
         return ImageIO.read(file);
     }
 
     @Override
-    public void write(File outputFile) throws IOException {
-        ImageIO.write(processedImage, "png", outputFile);
+    public void write(Object processedImage, File outputFile) throws IOException {
+        ImageIO.write((BufferedImage) processedImage, "png", outputFile);
     }
 }
 

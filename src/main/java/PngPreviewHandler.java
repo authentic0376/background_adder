@@ -3,14 +3,10 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 class PngPreviewHandler implements UpdatePreviewStrategy {
-    @Override
-    public void updatePreviewImages(FileProcessor fileProcessor, UIManager uiManager) {
-        updatePreviewImage(fileProcessor.getOriginalImage(), uiManager.getOriginalPreview());
-        updatePreviewImage(fileProcessor.getProcessedImage(), uiManager.getProcessedPreview());
-    }
 
-    private void updatePreviewImage(BufferedImage image, JLabel preview) {
-        ImageIcon originalIcon = scaleImageToLabel(image, preview);
+    @Override
+    public void updatePreviewImage(Object image, JLabel preview) {
+        ImageIcon originalIcon = scaleImageToLabel((BufferedImage) image, preview);
         preview.setIcon(originalIcon);
         preview.setText(null);
     }

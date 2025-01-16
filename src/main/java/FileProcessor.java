@@ -1,20 +1,13 @@
 import javax.swing.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 
 class FileProcessor {
-
-    private BufferedImage originalImage;
-    private BufferedImage processedImage;
     private FileHandlerStrategy strategy;
     private String extension;
-
-    public String getExtension() {
-        return extension;
-    }
-
+    private Object originalImage;
+    private Object processedImage;
     private final Map<String, FileHandlerStrategy> strategyMap;
 
     public FileProcessor(Map<String, FileHandlerStrategy> strategyMap) {
@@ -28,8 +21,9 @@ class FileProcessor {
         if (strategy == null) {
             throw new IllegalArgumentException("Unsupported file type: " + extension);
         }
-        originalImage = strategy.readImage(file);
-        processedImage = strategy.addWhiteBackground(originalImage);
+        Object[] images = strategy.processFile(file);
+        originalImage = images[0];
+        processedImage = images[1];
     }
 
 
@@ -44,7 +38,7 @@ class FileProcessor {
             String downloadFolder = userHome + File.separator + "Downloads";
             File outputFile = new File(downloadFolder, "processed_image.png");
 
-            strategy.write(outputFile);
+            strategy.write(processedImage, outputFile);
             JOptionPane.showMessageDialog(previewLabel, "Image saved successfully to " + outputFile.getAbsolutePath());
         } catch (IOException e) {
             JOptionPane.showMessageDialog(previewLabel, "Error saving image: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -70,11 +64,15 @@ class FileProcessor {
         return name.substring(lastDotIndex + 1).toLowerCase();
     }
 
-    public BufferedImage getOriginalImage() {
+    public String getExtension() {
+        return extension;
+    }
+
+    public Object getOriginalImage() {
         return originalImage;
     }
 
-    public BufferedImage getProcessedImage() {
+    public Object getProcessedImage() {
         return processedImage;
     }
 }

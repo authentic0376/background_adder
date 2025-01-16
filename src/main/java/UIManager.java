@@ -49,7 +49,8 @@ class UIManager {
 
     public void updatePreviewImages() {
         UpdatePreviewStrategy strategy = updatePreviewHandlers.get(fileProcessor.getExtension());
-        strategy.updatePreviewImages(fileProcessor, this);
+        strategy.updatePreviewImage(fileProcessor.getOriginalImage(), originalPreview);
+        strategy.updatePreviewImage(fileProcessor.getProcessedImage(), processedPreview);
     }
 
     private void initSaveButton() {
@@ -142,39 +143,8 @@ class UIManager {
         return jPanel;
     }
 
-    public JLabel getProcessedPreview() {
-        return processedPreview;
-    }
-
-    public FileProcessor getFileProcessor() {
-        return fileProcessor;
-    }
-
-    public JFrame getFrame() {
-        return frame;
-    }
-
     public JPanel getLeftPanel() {
         return leftPanel;
     }
 
-    public JLabel getOriginalPreview() {
-        return originalPreview;
-    }
-
-    public JPanel getRightPanel() {
-        return rightPanel;
-    }
-
-    public JPanel getCheckerboard() {
-        return checkerboard;
-    }
-
-    public JButton getSaveButton() {
-        return saveButton;
-    }
-
-    public JSplitPane getSplitPane() {
-        return splitPane;
-    }
 }

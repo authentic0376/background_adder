@@ -1,3 +1,5 @@
+import javax.swing.*;
+
 interface UpdatePreviewStrategy {
-    void updatePreviewImages(FileProcessor fileProcessor, UIManager uiManager);
+    void updatePreviewImage(Object image, JLabel preview);
 }

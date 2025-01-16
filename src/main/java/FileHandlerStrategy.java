@@ -1,11 +1,8 @@
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
 interface FileHandlerStrategy {
-    BufferedImage addWhiteBackground(BufferedImage originalImage);
+    Object[] processFile(File file) throws IOException;
 
-    BufferedImage readImage(File file) throws IOException;
-
-    void write(File outputFile) throws IOException;
+    void write(Object processedImage, File outputFile) throws IOException;
 }
