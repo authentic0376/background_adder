@@ -1,29 +1,25 @@
-import java.awt.*;
+import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.*;
-import java.awt.image.BufferedImage;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
 import java.util.List;
-import javax.swing.*;
 
 class FileDropHandler extends TransferHandler {
 
-    private final JPanel panel;
     private final FileProcessor fileProcessor;
-    private final JLabel originalPreview;
-    private final JLabel processedPreview;
+    private final UIManager uiManager;
 
-    public FileDropHandler(JPanel panel, FileProcessor fileProcessor, JLabel originalPreview, JLabel processedPreview) {
-        this.panel = panel;
+    public FileDropHandler(UIManager uiManager, FileProcessor fileProcessor) {
         this.fileProcessor = fileProcessor;
-        this.originalPreview = originalPreview;
-        this.processedPreview = processedPreview;
-
+        this.uiManager = uiManager;
         initializeDropTarget();
     }
 
     private void initializeDropTarget() {
-        new DropTarget(panel, new DropTargetAdapter() {
+        new DropTarget(uiManager.getLeftPanel(), new DropTargetAdapter() {
             @Override
             public void drop(DropTargetDropEvent dtde) {
                 handleDropEvent(dtde);
@@ -38,7 +34,13 @@ class FileDropHandler extends TransferHandler {
             File file = validateAndFetchFile(droppedFiles);
 
             fileProcessor.processFile(file);
-            updatePreviewImages();
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    uiManager.updatePreviewImages();
+                } catch (Exception e) {
+                    showErrorDialog(e);
+                }
+            });
         } catch (Exception e) {
             showErrorDialog(e);
         }
@@ -55,39 +57,7 @@ class FileDropHandler extends TransferHandler {
         return droppedFiles.get(0);
     }
 
-    private void updatePreviewImages() {
-        BufferedImage original = fileProcessor.getOriginalImage();
-        ImageIcon originalIcon = scaleImageToLabel(original, originalPreview);
-        originalPreview.setIcon(originalIcon);
-        originalPreview.setText(null);
-
-        BufferedImage processed = fileProcessor.getProcessedImage();
-        ImageIcon processedIcon = scaleImageToLabel(processed, processedPreview);
-        processedPreview.setIcon(processedIcon);
-        processedPreview.setText(null);
-    }
-
-    private ImageIcon scaleImageToLabel(BufferedImage image, JLabel label) {
-        double imageAspectRatio = (double) image.getWidth() / image.getHeight();
-        int panelWidth = label.getWidth();
-        int panelHeight = label.getHeight();
-        double panelAspectRatio = (double) panelWidth / panelHeight;
-
-        int targetWidth;
-        int targetHeight;
-
-        if (imageAspectRatio > panelAspectRatio) {
-            targetWidth = panelWidth;
-            targetHeight = (int) (panelWidth / imageAspectRatio);
-        } else {
-            targetHeight = panelHeight;
-            targetWidth = (int) (panelHeight * imageAspectRatio);
-        }
-
-        return new ImageIcon(image.getScaledInstance(targetWidth, targetHeight, Image.SCALE_SMOOTH));
-    }
-
     private void showErrorDialog(Exception e) {
-        JOptionPane.showMessageDialog(panel, "Error processing file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        JOptionPane.showMessageDialog(uiManager.getLeftPanel(), "Error processing file: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
     }
 }

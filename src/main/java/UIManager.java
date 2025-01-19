@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 class UIManager {
@@ -13,14 +15,25 @@ class UIManager {
     private JPanel checkerboard;
     private JButton saveButton;
     private JSplitPane splitPane;
+    private Map<String, UpdatePreviewStrategy> updatePreviewHandlers;
 
     public void initialize() {
-        initComponents(); // 컴포넌트 생성 및 레이아웃 설정
+        initComponents();
         assembleComponents();
 
-        fileProcessor = new FileProcessor();
+        Map<String, FileHandlerStrategy> fileHandlers = new HashMap<>();
+        fileHandlers.put("png", new PngHandler());
+        fileHandlers.put("svg", new SvgHandler());
+
+        fileProcessor = new FileProcessor(fileHandlers);
+
         saveButton.addActionListener(e -> fileProcessor.saveProcessedImage(processedPreview));
-        new FileDropHandler(leftPanel, fileProcessor, originalPreview, processedPreview);
+        new FileDropHandler(this, fileProcessor);
+
+
+        updatePreviewHandlers = new HashMap<>();
+        updatePreviewHandlers.put("png", new PngPreviewHandler());
+        updatePreviewHandlers.put("svg", new SvgPreviewHandler());
 
         finalFrameSetting();
     }
@@ -34,6 +47,12 @@ class UIManager {
         initProcessedPreview();
         initSaveButton();
         initSplitPane();
+    }
+
+    public void updatePreviewImages() {
+        UpdatePreviewStrategy strategy = updatePreviewHandlers.get(fileProcessor.getExtension());
+        strategy.updatePreviewImage(fileProcessor.getOriginalImage(), originalPreview);
+        strategy.updatePreviewImage(fileProcessor.getProcessedImage(), processedPreview);
     }
 
     private void initSaveButton() {
@@ -125,4 +144,9 @@ class UIManager {
         };
         return jPanel;
     }
+
+    public JPanel getLeftPanel() {
+        return leftPanel;
+    }
+
 }
