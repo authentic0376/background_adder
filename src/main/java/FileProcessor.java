@@ -1,44 +1,34 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
 
 class FileProcessor {
+    private FileHandlerStrategy strategy;
+    private String extension;
+    private Object originalImage;
+    private Object processedImage;
+    private final Map<String, FileHandlerStrategy> strategyMap;
 
-    private BufferedImage originalImage;
-    private BufferedImage processedImage;
+    public FileProcessor(Map<String, FileHandlerStrategy> strategyMap) {
+        this.strategyMap = strategyMap;
+    }
 
     public void processFile(File file) throws IOException {
-        validateFileExtension(file);
-        originalImage = ImageIO.read(file);
-        processedImage = createImageWithWhiteBackground(originalImage);
-    }
-
-    private void validateFileExtension(File file) {
         String extension = getFileExtension(file);
-        if (!extension.equals("png") && !extension.equals("svg")) {
+        strategy = strategyMap.get(extension);
+
+        if (strategy == null) {
             throw new IllegalArgumentException("Unsupported file type: " + extension);
         }
+        Object[] images = strategy.processFile(file);
+        originalImage = images[0];
+        processedImage = images[1];
     }
 
-    private BufferedImage createImageWithWhiteBackground(BufferedImage image) {
-        int width = image.getWidth();
-        int height = image.getHeight();
-        BufferedImage newImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-
-        Graphics2D g = newImage.createGraphics();
-        try {
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, width, height);
-            g.drawImage(image, 0, 0, width, height, null);
-        } finally {
-            g.dispose();
-        }
-
-        return newImage;
-    }
 
     public void saveProcessedImage(JLabel previewLabel) {
         if (processedImage == null) {
@@ -49,11 +39,12 @@ class FileProcessor {
         try {
             String userHome = System.getProperty("user.home");
             String downloadFolder = userHome + File.separator + "Downloads";
-            File outputFile = new File(downloadFolder, "processed_image.png");
+            String fileName = "processed_image";
 
-            ImageIO.write(processedImage, "png", outputFile);
-            JOptionPane.showMessageDialog(previewLabel, "Image saved successfully to " + outputFile.getAbsolutePath());
-        } catch (IOException e) {
+            Path outputPath = Paths.get(downloadFolder, fileName);
+            strategy.write(processedImage, outputPath);
+            JOptionPane.showMessageDialog(previewLabel, "Image saved successfully to " + outputPath);
+        } catch (IOException | TransformerException e) {
             JOptionPane.showMessageDialog(previewLabel, "Error saving image: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
@@ -63,7 +54,8 @@ class FileProcessor {
         if (hasExtension(name)) {
             throw new IllegalArgumentException("File does not have a valid extension: " + name);
         }
-        return _getFileExtension(name);
+        extension = _getFileExtension(name);
+        return extension;
     }
 
     private boolean hasExtension(String name) {
@@ -76,11 +68,15 @@ class FileProcessor {
         return name.substring(lastDotIndex + 1).toLowerCase();
     }
 
-    public BufferedImage getOriginalImage() {
+    public String getExtension() {
+        return extension;
+    }
+
+    public Object getOriginalImage() {
         return originalImage;
     }
 
-    public BufferedImage getProcessedImage() {
+    public Object getProcessedImage() {
         return processedImage;
     }
 }

@@ -1,10 +1,11 @@
-import java.awt.*;
+import javax.swing.*;
 import java.awt.datatransfer.DataFlavor;
-import java.awt.dnd.*;
-import java.awt.image.BufferedImage;
+import java.awt.dnd.DnDConstants;
+import java.awt.dnd.DropTarget;
+import java.awt.dnd.DropTargetAdapter;
+import java.awt.dnd.DropTargetDropEvent;
 import java.io.File;
 import java.util.List;
-import javax.swing.*;
 
 class FileDropHandler extends TransferHandler {
 
@@ -33,7 +34,13 @@ class FileDropHandler extends TransferHandler {
             File file = validateAndFetchFile(droppedFiles);
 
             fileProcessor.processFile(file);
-            uiManager.updatePreviewImages();
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    uiManager.updatePreviewImages();
+                } catch (Exception e) {
+                    showErrorDialog(e);
+                }
+            });
         } catch (Exception e) {
             showErrorDialog(e);
         }
