@@ -25,12 +25,14 @@
 
 ## Installation
 
+https://github.com/authentic0376/background_adder/releases/tag/v0.2.1
+
 ---
 
 ## Usage
 
 1. Run the program.
-2. Drag and drop a PNG image with a transparent background.
+2. Drag and drop a PNG or SVG image with a transparent background.
 3. Click the "Execute" button to save the result.
 4. The file will be saved in the Downloads directory.
 
