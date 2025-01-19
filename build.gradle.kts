@@ -15,6 +15,7 @@ application {
 }
 
 dependencies {
+    implementation("org.apache.xmlgraphics:batik-swing:1.16")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }
