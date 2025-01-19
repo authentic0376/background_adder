@@ -7,6 +7,7 @@ class PngPreviewHandler implements UpdatePreviewStrategy {
     @Override
     public void updatePreviewImage(Object image, JLabel preview) {
         ImageIcon originalIcon = scaleImageToLabel((BufferedImage) image, preview);
+        preview.removeAll();
         preview.setIcon(originalIcon);
         preview.setText(null);
     }

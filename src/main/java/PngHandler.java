@@ -3,6 +3,8 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 class PngHandler implements FileHandlerStrategy {
     @Override
@@ -33,8 +35,9 @@ class PngHandler implements FileHandlerStrategy {
     }
 
     @Override
-    public void write(Object processedImage, File outputFile) throws IOException {
-        ImageIO.write((BufferedImage) processedImage, "png", outputFile);
+    public void write(Object processedImage, Path outputPath) throws IOException {
+        Path filePathWithExtension = Paths.get(outputPath.toString() + ".png");
+        ImageIO.write((BufferedImage) processedImage, "png", filePathWithExtension.toFile());
     }
 }
 

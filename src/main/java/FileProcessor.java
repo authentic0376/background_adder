@@ -1,6 +1,9 @@
 import javax.swing.*;
+import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 
 class FileProcessor {
@@ -36,11 +39,12 @@ class FileProcessor {
         try {
             String userHome = System.getProperty("user.home");
             String downloadFolder = userHome + File.separator + "Downloads";
-            File outputFile = new File(downloadFolder, "processed_image.png");
+            String fileName = "processed_image";
 
-            strategy.write(processedImage, outputFile);
-            JOptionPane.showMessageDialog(previewLabel, "Image saved successfully to " + outputFile.getAbsolutePath());
-        } catch (IOException e) {
+            Path outputPath = Paths.get(downloadFolder, fileName);
+            strategy.write(processedImage, outputPath);
+            JOptionPane.showMessageDialog(previewLabel, "Image saved successfully to " + outputPath);
+        } catch (IOException | TransformerException e) {
             JOptionPane.showMessageDialog(previewLabel, "Error saving image: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }

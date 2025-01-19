@@ -34,7 +34,13 @@ class FileDropHandler extends TransferHandler {
             File file = validateAndFetchFile(droppedFiles);
 
             fileProcessor.processFile(file);
-            uiManager.updatePreviewImages();
+            SwingUtilities.invokeLater(() -> {
+                try {
+                    uiManager.updatePreviewImages();
+                } catch (Exception e) {
+                    showErrorDialog(e);
+                }
+            });
         } catch (Exception e) {
             showErrorDialog(e);
         }

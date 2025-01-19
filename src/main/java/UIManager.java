@@ -23,6 +23,7 @@ class UIManager {
 
         Map<String, FileHandlerStrategy> fileHandlers = new HashMap<>();
         fileHandlers.put("png", new PngHandler());
+        fileHandlers.put("svg", new SvgHandler());
 
         fileProcessor = new FileProcessor(fileHandlers);
 
@@ -32,6 +33,7 @@ class UIManager {
 
         updatePreviewHandlers = new HashMap<>();
         updatePreviewHandlers.put("png", new PngPreviewHandler());
+        updatePreviewHandlers.put("svg", new SvgPreviewHandler());
 
         finalFrameSetting();
     }
