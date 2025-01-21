@@ -51,7 +51,7 @@ public class SvgHandler implements FileHandlerStrategy {
 
             // 1. Convert the Document to a string
             StringWriter writer = new StringWriter();
-            DOMUtilities.writeDocument(doc, writer); // Batik의 DOMUtilities로 Document를 문자열로 변환
+            DOMUtilities.writeDocument(doc, writer);
             String svgContent = writer.toString();
 
             // 2. Save the string to a temporary file
@@ -70,8 +70,13 @@ public class SvgHandler implements FileHandlerStrategy {
     @Override
     public void write(Object processedImage, Path outputPath) {
         File tempFile = (File) processedImage;
+        Path targetPath = Paths.get(outputPath.toString() + ".svg");
+
         try {
-            Files.move(tempFile.toPath(), Paths.get(outputPath.toString() + ".svg"));
+            if (Files.exists(targetPath)) {
+                Files.delete(targetPath);
+            }
+            Files.move(tempFile.toPath(), targetPath);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
