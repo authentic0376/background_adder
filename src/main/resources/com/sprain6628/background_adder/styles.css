@@ -20,17 +20,9 @@
 
 }
 
-.left-pane {
-    -fx-background-image: url("sample.jpg");
-    -fx-background-size: contain;
-    -fx-background-repeat: no-repeat;
-    -fx-background-position: center;
-}
-
-.right-pane {
-    -fx-background-image: url("sample.jpg");
-    -fx-background-size: contain;
-    -fx-background-repeat: no-repeat;
+.left-pane, .right-pane {
+    -fx-background-image: url("checkboard.png");
+    -fx-background-repeat: repeat;
     -fx-background-position: center;
 }
 
