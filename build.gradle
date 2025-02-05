@@ -26,7 +26,7 @@ tasks.withType(JavaCompile) {
 
 application {
     mainModule = 'com.sprain6628.background_adder'
-    mainClass = 'com.sprain6628.background_adder.HelloApplication'
+    mainClass = 'com.sprain6628.background_adder.BackgroundAdderApp'
 }
 
 javafx {
