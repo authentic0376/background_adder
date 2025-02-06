@@ -1,5 +1,6 @@
 package com.sprain6628.background_adder;
 
+import javafx.beans.binding.Bindings;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
@@ -9,31 +10,33 @@ import javafx.scene.layout.*;
 import javafx.util.Builder;
 
 import java.io.File;
-import java.net.URISyntaxException;
 import java.util.List;
-import java.util.Objects;
 
 public class ViewBuilder implements Builder<Region> {
 
-    private Pane leftPane;
-    private Pane rightPane;
+    private final Model model;
+
+    public ViewBuilder(Model model) {
+        this.model = model;
+    }
 
     @Override
     public Region build() {
         BorderPane root = createBorderPane();
+
         SplitPane splitPane = createSplitPane();
+
         StackPane leftStackPane = createStackPane();
         StackPane rightStackPane = createStackPane();
 
-        leftPane = new Pane();
-        leftPane.setId("leftPane");
-        leftStackPane.getChildren().add(leftPane);
+        Pane leftPane = createLeftPane();
+        Pane rightPane = createRightPane();
 
-        rightPane = new Pane();
-        rightPane.setId("rightPane");
+        leftStackPane.getChildren().add(leftPane);
         rightStackPane.getChildren().add(rightPane);
 
         splitPane.getItems().addAll(leftStackPane, rightStackPane);
+
         root.setCenter(splitPane);
 
         HBox bottomBox = createBottomBox();
@@ -41,20 +44,27 @@ public class ViewBuilder implements Builder<Region> {
 
         bottomBox.getChildren().add(saveButton);
         root.setBottom(bottomBox);
-
-        setLeftPaneDragOver();
-        setLeftPaneDragDropped();
-
-        File sample = null;
-        try {
-            sample = new File(Objects.requireNonNull(getClass().getResource("sample.jpg")).toURI());
-        } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
-        }
-        addImagePaneToPane(leftPane, sample);
-        addImagePaneToPane(rightPane, sample);
-
         return root;
+    }
+
+    private static Pane createRightPane() {
+        return new Pane();
+    }
+
+    private Pane createLeftPane() {
+        Pane pane = new Pane();
+        pane.backgroundProperty().bind(Bindings.createObjectBinding(
+                        () -> {
+                            Image image = model.getOriginalImageProperty();
+                            return createBackground(image);
+                        },
+                        model.originalImageProperty() // Observable
+                )
+        );
+
+        setDragOver(pane);
+        setDragDropped(pane);
+        return pane;
     }
 
     private static Button createSaveButton() {
@@ -89,8 +99,8 @@ public class ViewBuilder implements Builder<Region> {
         return root;
     }
 
-    private void setLeftPaneDragDropped() {
-        leftPane.setOnDragDropped(event -> {
+    private void setDragDropped(Pane pane) {
+        pane.setOnDragDropped(event -> {
             Dragboard db = event.getDragboard();
             boolean success = false;
 
@@ -102,7 +112,7 @@ public class ViewBuilder implements Builder<Region> {
 
                 // 확장자 검사 (이미지 파일인지 확인)
                 if (isImageFile(file)) {
-                    addImagePaneToPane(leftPane, file);
+                    model.setDroppedFileProperty(file);
                     success = true;
                 }
             }
@@ -120,27 +130,27 @@ public class ViewBuilder implements Builder<Region> {
                 fileName.endsWith(".bmp");
     }
 
-    private void setLeftPaneDragOver() {
-        leftPane.setOnDragOver(event -> {
-            if (event.getGestureSource() != leftPane && event.getDragboard().hasFiles()) {
+    private void setDragOver(Pane pane) {
+        pane.setOnDragOver(event -> {
+            if (event.getGestureSource() != pane && event.getDragboard().hasFiles()) {
                 event.acceptTransferModes(TransferMode.COPY_OR_MOVE);
             }
             event.consume();
         });
     }
 
-    private void addImagePaneToPane(Pane pane, File imgFile) {
+    private Background createBackground(Image image) {
 
-        Image backgroundImage = new Image(imgFile.toURI().toString());
-
+        if (image == null) {
+            return Background.EMPTY; // 이미지 없으면 기본 배경
+        }
         // 배경 이미지 설정
-        BackgroundImage background = new BackgroundImage(
-                backgroundImage,
+        BackgroundImage backgroundImage = new BackgroundImage(
+                image,
                 BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,
                 BackgroundPosition.CENTER,
                 new BackgroundSize(100, 100, true, true, true, false)
         );
-
-        pane.setBackground(new Background(background));
+        return new Background(backgroundImage);
     }
 }
