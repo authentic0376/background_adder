@@ -6,16 +6,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 public class BackgroundAdderApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("scene.fxml"));
-        Parent root = loader.load();
+        Scene scene = new Scene(new Controller().getView(), 900, 600);
+        scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("styles.css")).toExternalForm());
 
-        Scene scene = new Scene(root, 900, 600);
-
-        primaryStage.setTitle("Background Adder");
         primaryStage.setScene(scene);
+        primaryStage.setTitle("Background Adder");
         primaryStage.show();
     }
 

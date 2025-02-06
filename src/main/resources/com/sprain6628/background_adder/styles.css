@@ -20,7 +20,7 @@
 
 }
 
-.left-pane, .right-pane {
+.checkerboard-pattern {
     -fx-background-image: url("checkboard.png");
     -fx-background-repeat: repeat;
     -fx-background-position: center;
