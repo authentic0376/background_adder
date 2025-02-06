@@ -5,6 +5,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Pane?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="com.sprain6628.background_adder.Controller" stylesheets="@styles.css"
             style="-fx-padding: 10px;"
@@ -12,9 +13,11 @@
 
     <center>
         <SplitPane dividerPositions="0.5">
-            <StackPane fx:id="leftPane" prefWidth="40" prefHeight="40" styleClass="left-pane">
+            <StackPane prefWidth="40" prefHeight="40" styleClass="left-pane">
+                <Pane fx:id="leftPane"/>
             </StackPane>
-            <StackPane fx:id="rightPane" prefWidth="40" prefHeight="40" styleClass="right-pane">
+            <StackPane prefWidth="40" prefHeight="40" styleClass="right-pane">
+                <Pane fx:id="rightPane"/>
             </StackPane>
         </SplitPane>
     </center>
