@@ -124,10 +124,8 @@ public class ViewBuilder implements Builder<Region> {
             if (db.hasFiles()) {
                 List<File> files = db.getFiles();
 
-                // 하나의 파일만 처리
                 File file = files.get(0);
 
-                // 확장자 검사 (이미지 파일인지 확인)
                 if (isImageFile(file)) {
                     model.setDroppedFileProperty(file);
                     success = true;
@@ -159,9 +157,9 @@ public class ViewBuilder implements Builder<Region> {
     private Background createBackground(Image image) {
 
         if (image == null) {
-            return Background.EMPTY; // 이미지 없으면 기본 배경
+            return Background.EMPTY;
         }
-        // 배경 이미지 설정
+
         BackgroundImage backgroundImage = new BackgroundImage(
                 image,
                 BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT,

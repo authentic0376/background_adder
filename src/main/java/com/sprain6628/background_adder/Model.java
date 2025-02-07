@@ -9,7 +9,7 @@ import java.io.File;
 public class Model {
     private final ObjectProperty<File> droppedFileProperty = new SimpleObjectProperty<>();
     private final ObjectProperty<File> processedFileProperty = new SimpleObjectProperty<>();
-    
+
     private final ObjectProperty<Image> originalImageProperty = new SimpleObjectProperty<>();
     private final ObjectProperty<Image> processedImageProperty = new SimpleObjectProperty<>();
 
