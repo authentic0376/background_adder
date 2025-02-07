@@ -47,8 +47,18 @@ public class ViewBuilder implements Builder<Region> {
         return root;
     }
 
-    private static Pane createRightPane() {
-        return new Pane();
+    private Pane createRightPane() {
+        Pane pane = new Pane();
+        pane.backgroundProperty().bind(Bindings.createObjectBinding(
+                        () -> {
+                            Image image = model.getProcessedImageProperty();
+                            return createBackground(image);
+                        },
+                        model.processedImageProperty() // Observable
+                )
+        );
+
+        return pane;
     }
 
     private Pane createLeftPane() {

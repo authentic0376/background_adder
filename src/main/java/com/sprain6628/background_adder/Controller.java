@@ -1,7 +1,7 @@
 package com.sprain6628.background_adder;
 
-import com.sprain6628.background_adder.file_convert_strategies.ConvertStrategy;
-import com.sprain6628.background_adder.file_convert_strategies.PngConverter;
+import com.sprain6628.background_adder.service.ImageService;
+import com.sprain6628.background_adder.service.PngService;
 import javafx.beans.binding.Bindings;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
@@ -12,25 +12,24 @@ import java.util.List;
 import java.util.Map;
 
 public class Controller {
-
-
     private final ViewBuilder viewBuilder;
     private final Model model;
-    private final Map<String, ConvertStrategy> convertStrategyMap;
+    private final Map<String, ImageService> imageServiceMap;
 
     public Controller() {
         this.model = new Model();
         viewBuilder = new ViewBuilder(model);
-        convertStrategyMap = new HashMap<>();
+        imageServiceMap = new HashMap<>();
 
-        initConverterStrategyMap();
-        bindImageToFile();
+        initImageServiceMap();
+        bind();
     }
 
-    private void initConverterStrategyMap() {
-        List<ConvertStrategy> convertStrategies = List.of(new PngConverter());
-        for (ConvertStrategy strategy : convertStrategies) {
-            convertStrategyMap.put(strategy.getExtension(), strategy);
+    private void initImageServiceMap() {
+        List<ImageService> imageServices = List.of(new PngService());
+
+        for (ImageService service : imageServices) {
+            imageServiceMap.put(service.getExtension(), service);
         }
     }
 
@@ -38,7 +37,7 @@ public class Controller {
         return viewBuilder.build();
     }
 
-    private void bindImageToFile() {
+    private void bind() {
 
         model.originalImageProperty().bind(
                 Bindings.createObjectBinding(
@@ -46,16 +45,38 @@ public class Controller {
                         model.droppedFileProperty()
                 )
         );
+
+        model.processedFileProperty().bind(
+                Bindings.createObjectBinding(
+                        () -> addBackground(model.getDroppedFileProperty()),
+                        model.droppedFileProperty()
+                )
+        );
+        model.processedImageProperty().bind(
+                Bindings.createObjectBinding(
+                        () -> convert(model.getProcessedFileProperty()),
+                        model.processedFileProperty()
+                )
+        );
+    }
+
+    private File addBackground(File file) {
+        if (file == null)
+            return null;
+        ImageService service = resolveImageService(file);
+        return service.addBackground(file);
     }
 
     private Image convert(File file) {
-        ConvertStrategy strategy = resolveStrategy(file);
-        return strategy.convert(file);
+        if (file == null)
+            return null;
+        ImageService service = resolveImageService(file);
+        return service.convert(file);
     }
 
-    private ConvertStrategy resolveStrategy(File file) {
+    private ImageService resolveImageService(File file) {
         String extension = getFileExtension(file);
-        return convertStrategyMap.get(extension);
+        return imageServiceMap.get(extension);
     }
 
     private String getFileExtension(File file) {
@@ -75,6 +96,4 @@ public class Controller {
         int lastDotIndex = name.lastIndexOf(".");
         return name.substring(lastDotIndex + 1).toLowerCase();
     }
-
-
 }
