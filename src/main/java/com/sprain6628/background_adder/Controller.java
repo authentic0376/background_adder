@@ -7,18 +7,22 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.Region;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Controller {
+public class Controller implements ControlCallback{
     private final ViewBuilder viewBuilder;
     private final Model model;
     private final Map<String, ImageService> imageServiceMap;
 
     public Controller() {
         this.model = new Model();
-        viewBuilder = new ViewBuilder(model);
+        viewBuilder = new ViewBuilder(model, this);
         imageServiceMap = new HashMap<>();
 
         initImageServiceMap();
@@ -96,4 +100,31 @@ public class Controller {
         int lastDotIndex = name.lastIndexOf(".");
         return name.substring(lastDotIndex + 1).toLowerCase();
     }
+
+    @Override
+    public void save() {
+        File tempFile = model.getProcessedFileProperty();
+
+        Path targetPath = createTargetPath(tempFile);
+
+        try {
+            if (Files.exists(targetPath)) {
+                Files.delete(targetPath);
+            }
+            Files.move(tempFile.toPath(), targetPath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private Path createTargetPath(File tempFile) {
+        ImageService service = resolveImageService(tempFile);
+        String extension = service.getExtension();
+
+        Path downloadFolder = Paths.get(System.getProperty("user.home"), "Downloads");
+        String fileName = String.format("processed_image.%s", extension);
+
+        return downloadFolder.resolve(fileName);
+    }
+
 }

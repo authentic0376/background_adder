@@ -15,9 +15,11 @@ import java.util.List;
 public class ViewBuilder implements Builder<Region> {
 
     private final Model model;
+    private final ControlCallback callback;
 
-    public ViewBuilder(Model model) {
+    public ViewBuilder(Model model, ControlCallback callback) {
         this.model = model;
+        this.callback = callback;
     }
 
     @Override
@@ -77,9 +79,14 @@ public class ViewBuilder implements Builder<Region> {
         return pane;
     }
 
-    private static Button createSaveButton() {
+    private Button createSaveButton() {
         Button saveButton = new Button("Save");
         saveButton.getStyleClass().add("save-button");
+        saveButton.setOnAction(
+                (e) -> {
+                    this.callback.save();
+                }
+        );
         return saveButton;
     }
 
