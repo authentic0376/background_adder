@@ -4,9 +4,11 @@ import com.sprain6628.background_adder.service.FileService;
 import com.sprain6628.background_adder.service.ImageService;
 import com.sprain6628.background_adder.service.PngService;
 import com.sprain6628.background_adder.service.SvgService;
+import com.sprain6628.background_adder.util.FileUtil;
 import javafx.scene.image.Image;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +29,8 @@ public class Interactor {
         initImageServiceMap();
     }
 
-    public void save(File tempFile) {
-        fileService.save(tempFile);
+    public File save(File tempFile) throws IOException {
+        return fileService.save(tempFile);
     }
 
     private void initImageServiceMap() {
@@ -66,7 +68,7 @@ public class Interactor {
     }
 
     private ImageService resolveImageService(File file) {
-        String extension = fileService.getFileExtension(file);
+        String extension = FileUtil.getFileExtension(file);
         return imageServiceMap.get(extension);
     }
 

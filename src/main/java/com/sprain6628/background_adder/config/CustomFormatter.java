@@ -1,6 +1,7 @@
 package com.sprain6628.background_adder.config;
 
-import java.util.logging.*;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
 
 public class CustomFormatter extends Formatter {
     // ANSI 색상 코드

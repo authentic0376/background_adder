@@ -4,6 +4,8 @@ import javafx.beans.binding.Bindings;
 import javafx.scene.layout.Region;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.logging.Logger;
 
 public class Controller implements ControlCallback {
@@ -58,8 +60,10 @@ public class Controller implements ControlCallback {
     }
 
     @Override
-    public void save() {
+    public void save() throws IOException {
         File tempFile = model.getProcessedFileProperty();
+        if (tempFile == null)
+            throw new FileNotFoundException();
         interactor.save(tempFile);
     }
 }

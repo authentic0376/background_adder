@@ -1,6 +1,8 @@
 package com.sprain6628.background_adder;
 
+import com.sprain6628.background_adder.util.FileUtil;
 import javafx.beans.binding.Bindings;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.SplitPane;
 import javafx.scene.image.Image;
@@ -10,6 +12,8 @@ import javafx.scene.layout.*;
 import javafx.util.Builder;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -89,7 +93,13 @@ public class ViewBuilder implements Builder<Region> {
         saveButton.getStyleClass().add("save-button");
         saveButton.setOnAction(
                 (e) -> {
-                    this.callback.save();
+                    try {
+                        this.callback.save();
+                    } catch (FileNotFoundException err) {
+                        showAlert("Drop the image file first", "Error");
+                    } catch (IOException err) {
+                        showAlert("Failed to save the file.", "Error");
+                    }
                 }
         );
         return saveButton;
@@ -134,13 +144,37 @@ public class ViewBuilder implements Builder<Region> {
                 if (isImageFile(file)) {
                     model.setDroppedFileProperty(file);
                     success = true;
+
+                } else {
+                    showAlert(
+                            String.format("%s is not supported.\n File: %s", FileUtil.getFileExtension(file), file.getName())
+                            , "Unsupported format"
+                    );
                 }
+                event.setDropCompleted(success);
+                event.consume();
             }
 
-            event.setDropCompleted(success);
-            event.consume();
+
         });
 
+    }
+
+    private void showAlert() {
+        showAlert("이것은 JavaFX에서 띄운 팝업입니다.", "팝업 헤더", "정보");
+    }
+
+    private void showAlert(String text, String header) {
+        showAlert(text, header, "정보");
+    }
+
+    private void showAlert(String text, String header, String title) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(header);
+        alert.setContentText(text);
+
+        alert.showAndWait();
     }
 
     private boolean isImageFile(File file) {

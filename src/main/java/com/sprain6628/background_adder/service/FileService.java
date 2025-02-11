@@ -12,24 +12,13 @@ public class FileService {
     private String originalFileName;
 
 
-    public void save(File tempFile) {
-
+    public File save(File tempFile) throws IOException {
+        if (tempFile == null) return null;
         Path targetPath = createTargetPath();
-
-        try {
-            Files.copy(tempFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
-
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        Files.copy(tempFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+        return targetPath.toFile();
     }
 
-    public String getFileExtension(File file) {
-        String name = file.getName();
-        if (hasExtension(name))
-            return splitFileName(name)[1];
-        return "";
-    }
 
     public void setOriginalFileName(String name) {
         originalFileName = name;
@@ -54,22 +43,5 @@ public class FileService {
 
         fileName.insert(lastDotIndex, suffix);
         return fileName.toString();
-    }
-
-    private String[] splitFileName(String name) {
-        if (!hasExtension(name)) {
-            return new String[]{name, ""};
-        }
-
-        int lastDotIndex = name.lastIndexOf(".");
-        return new String[]{
-                name.substring(0, lastDotIndex),
-                name.substring(lastDotIndex + 1).toLowerCase()
-        };
-    }
-
-    private boolean hasExtension(String fileName) {
-        int lastDotIndex = fileName.lastIndexOf(".");
-        return lastDotIndex > 0 && lastDotIndex < fileName.length() - 1;
     }
 }
