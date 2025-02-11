@@ -1,5 +1,8 @@
 package com.sprain6628.background_adder;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.sprain6628.background_adder.model.ExceptionModel;
 import com.sprain6628.background_adder.service.FileService;
 import com.sprain6628.background_adder.service.ImageService;
 import com.sprain6628.background_adder.service.PngService;
@@ -15,22 +18,28 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Singleton
 public class Interactor {
     private final Map<String, ImageService> imageServiceMap;
     private final FileService fileService;
-
+    private final ExceptionModel exceptionModel;
     private static final Logger LOGGER = Logger.getLogger(Interactor.class.getName());
 
-    public Interactor() {
+    @Inject
+    public Interactor(ExceptionModel exceptionModel, FileService fileService) {
+        this.fileService = fileService;
+        this.exceptionModel = exceptionModel;
 
         imageServiceMap = new HashMap<>();
-        fileService = new FileService();
-
         initImageServiceMap();
     }
 
-    public File save(File tempFile) throws IOException {
-        return fileService.save(tempFile);
+    public File save(File tempFile) {
+        try {
+            return fileService.save(tempFile);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void initImageServiceMap() {

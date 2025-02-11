@@ -11,7 +11,11 @@ module com.sprain6628.background_adder {
 
     requires batik.anim; // SAXSVGDocumentFactory
     requires batik.transcoder; // PNG Transcoder
+    requires com.google.guice;
+    requires jakarta.inject;
 
     exports com.sprain6628.background_adder;
     exports com.sprain6628.background_adder.config;
+    exports com.sprain6628.background_adder.model;
+    exports com.sprain6628.background_adder.service;
 }

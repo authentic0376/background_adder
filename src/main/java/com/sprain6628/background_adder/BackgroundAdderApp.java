@@ -1,5 +1,8 @@
 package com.sprain6628.background_adder;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
+import com.sprain6628.background_adder.config.CustomModule;
 import com.sprain6628.background_adder.config.LoggingConfig;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -11,8 +14,10 @@ import java.util.Objects;
 public class BackgroundAdderApp extends Application {
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
-        Scene scene = new Scene(new Controller().getView(), 900, 600);
+    public void start(Stage primaryStage) {
+        Injector injector = Guice.createInjector(new CustomModule());
+        Controller controller = injector.getInstance(Controller.class);
+        Scene scene = new Scene(controller.getView(), 900, 600);
         scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("/styles.css")).toExternalForm());
 
         primaryStage.setScene(scene);

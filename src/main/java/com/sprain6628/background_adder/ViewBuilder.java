@@ -1,5 +1,8 @@
 package com.sprain6628.background_adder;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+import com.sprain6628.background_adder.model.ImageModel;
 import com.sprain6628.background_adder.util.FileUtil;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.Alert;
@@ -18,13 +21,15 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+@Singleton
 public class ViewBuilder implements Builder<Region> {
 
-    private final Model model;
+    private final ImageModel model;
     private final ControlCallback callback;
     private static final Logger LOGGER = Logger.getLogger(ViewBuilder.class.getName());
 
-    public ViewBuilder(Model model, ControlCallback callback) {
+    @Inject
+    public ViewBuilder(ImageModel model, ControlCallback callback) {
         this.model = model;
         this.callback = callback;
     }
@@ -60,7 +65,7 @@ public class ViewBuilder implements Builder<Region> {
         Pane pane = new Pane();
         pane.backgroundProperty().bind(Bindings.createObjectBinding(
                         () -> {
-                            Image image = model.getProcessedImageProperty();
+                            Image image = model.getProcessedImage();
                             LOGGER.log(Level.FINE, String.format("Right Panel Bind Background with image: %s", image));
                             return createBackground(image);
                         },
@@ -75,7 +80,7 @@ public class ViewBuilder implements Builder<Region> {
         Pane pane = new Pane();
         pane.backgroundProperty().bind(Bindings.createObjectBinding(
                         () -> {
-                            Image image = model.getOriginalImageProperty();
+                            Image image = model.getOriginalImage();
                             LOGGER.log(Level.FINE, String.format("Left Panel Bind Background with image: %s", image));
                             return createBackground(image);
                         },
@@ -142,7 +147,7 @@ public class ViewBuilder implements Builder<Region> {
                 File file = files.get(0);
 
                 if (isImageFile(file)) {
-                    model.setDroppedFileProperty(file);
+                    model.setDroppedFile(file);
                     success = true;
 
                 } else {

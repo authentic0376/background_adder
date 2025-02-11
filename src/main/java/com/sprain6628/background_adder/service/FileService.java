@@ -1,5 +1,7 @@
 package com.sprain6628.background_adder.service;
 
+import com.google.inject.Singleton;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,6 +9,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 
+@Singleton
 public class FileService {
 
     private String originalFileName;
