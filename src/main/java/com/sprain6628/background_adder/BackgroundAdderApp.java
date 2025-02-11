@@ -3,10 +3,10 @@ package com.sprain6628.background_adder;
 import com.sprain6628.background_adder.config.LoggingConfig;
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.util.Objects;
-import java.util.logging.Logger;
 
 public class BackgroundAdderApp extends Application {
 
@@ -17,6 +17,13 @@ public class BackgroundAdderApp extends Application {
 
         primaryStage.setScene(scene);
         primaryStage.setTitle("Background Adder");
+        primaryStage.getIcons().add(
+                new Image(
+                        Objects.requireNonNull(
+                                getClass().getResourceAsStream("/image/background adder.png") // .ico doesn't work
+                        )
+                )
+        );
         primaryStage.show();
     }
 
