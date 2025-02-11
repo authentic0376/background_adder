@@ -12,12 +12,15 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Controller implements ControlCallback {
     private final ViewBuilder viewBuilder;
     private final Model model;
     private final Map<String, ImageService> imageServiceMap;
     private final FileService fileService;
+    private static final Logger LOGGER = Logger.getLogger(Controller.class.getName());
 
     public Controller() {
         this.model = new Model();
@@ -46,6 +49,7 @@ public class Controller implements ControlCallback {
 
     private void bind() {
 
+        // Dropped File -> Original Image
         model.originalImageProperty().bind(
                 Bindings.createObjectBinding(
                         () -> convert(model.getDroppedFileProperty()),
@@ -53,12 +57,15 @@ public class Controller implements ControlCallback {
                 )
         );
 
+        // Dropped File -> Processed File
         model.processedFileProperty().bind(
                 Bindings.createObjectBinding(
                         () -> addBackground(model.getDroppedFileProperty()),
                         model.droppedFileProperty()
                 )
         );
+
+        // Processed File -> Processed Image
         model.processedImageProperty().bind(
                 Bindings.createObjectBinding(
                         () -> convert(model.getProcessedFileProperty()),
@@ -68,16 +75,24 @@ public class Controller implements ControlCallback {
     }
 
     private File addBackground(File file) {
-        if (file == null)
+        LOGGER.log(Level.FINE, "Start Add Background");
+        if (file == null) {
+            LOGGER.log(Level.FINE, "End Add Background No File");
             return null;
+        }
         ImageService service = resolveImageService(file);
+        LOGGER.log(Level.FINE, "End Add Background");
         return service.addBackground(file);
     }
 
     private Image convert(File file) {
-        if (file == null)
+        LOGGER.log(Level.FINE, "Start Convert");
+        if (file == null) {
+            LOGGER.log(Level.FINE, "End Convert No File");
             return null;
+        }
         ImageService service = resolveImageService(file);
+        LOGGER.log(Level.FINE, "End Convert");
         return service.convert(file);
     }
 

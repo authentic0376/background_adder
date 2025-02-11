@@ -11,11 +11,14 @@ import javafx.util.Builder;
 
 import java.io.File;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ViewBuilder implements Builder<Region> {
 
     private final Model model;
     private final ControlCallback callback;
+    private static final Logger LOGGER = Logger.getLogger(ViewBuilder.class.getName());
 
     public ViewBuilder(Model model, ControlCallback callback) {
         this.model = model;
@@ -54,6 +57,7 @@ public class ViewBuilder implements Builder<Region> {
         pane.backgroundProperty().bind(Bindings.createObjectBinding(
                         () -> {
                             Image image = model.getProcessedImageProperty();
+                            LOGGER.log(Level.FINE, String.format("Right Panel Bind Background with image: %s", image));
                             return createBackground(image);
                         },
                         model.processedImageProperty() // Observable
@@ -68,6 +72,7 @@ public class ViewBuilder implements Builder<Region> {
         pane.backgroundProperty().bind(Bindings.createObjectBinding(
                         () -> {
                             Image image = model.getOriginalImageProperty();
+                            LOGGER.log(Level.FINE, String.format("Left Panel Bind Background with image: %s", image));
                             return createBackground(image);
                         },
                         model.originalImageProperty() // Observable
@@ -142,7 +147,7 @@ public class ViewBuilder implements Builder<Region> {
         String fileName = file.getName().toLowerCase();
         return fileName.endsWith(".png") || fileName.endsWith(".jpg") ||
                 fileName.endsWith(".jpeg") || fileName.endsWith(".gif") ||
-                fileName.endsWith(".bmp");
+                fileName.endsWith(".bmp") || fileName.endsWith(".svg");
     }
 
     private void setDragOver(Pane pane) {

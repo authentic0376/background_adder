@@ -21,7 +21,7 @@
 }
 
 .checkerboard-pattern {
-    -fx-background-image: url("checkboard.png");
+    -fx-background-image: url("image/checkboard.png");
     -fx-background-repeat: repeat;
     -fx-background-position: center;
 }
