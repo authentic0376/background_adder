@@ -1,4 +1,4 @@
-package com.sprain6628.background_adder;
+package com.sprain6628.background_adder.config;
 
 import java.io.IOException;
 import java.util.logging.*;
@@ -7,7 +7,7 @@ public class LoggingConfig {
     public static void setupLogging() {
         try {
             LogManager.getLogManager().readConfiguration(
-                    LoggingConfig.class.getResourceAsStream("logging.properties")
+                    LoggingConfig.class.getResourceAsStream("/logging.properties")
             );
         } catch (IOException e) {
             e.printStackTrace();

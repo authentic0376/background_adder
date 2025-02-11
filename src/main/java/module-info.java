@@ -13,4 +13,5 @@ module com.sprain6628.background_adder {
     requires batik.transcoder; // PNG Transcoder
 
     exports com.sprain6628.background_adder;
+    exports com.sprain6628.background_adder.config;
 }

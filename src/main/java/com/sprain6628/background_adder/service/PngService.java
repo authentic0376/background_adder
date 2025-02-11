@@ -59,10 +59,4 @@ public class PngService implements ImageService {
     private BufferedImage readImage(File file) throws IOException {
         return ImageIO.read(file);
     }
-
-    public void write(Object processedImage, Path outputPath) throws IOException {
-        Path filePathWithExtension = Paths.get(outputPath.toString() + ".png");
-        ImageIO.write((BufferedImage) processedImage, "png", filePathWithExtension.toFile());
-    }
-
 }

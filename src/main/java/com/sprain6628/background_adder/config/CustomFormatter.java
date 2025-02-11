@@ -1,4 +1,4 @@
-package com.sprain6628.background_adder;
+package com.sprain6628.background_adder.config;
 
 import java.util.logging.*;
 
