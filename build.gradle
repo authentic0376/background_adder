@@ -7,7 +7,7 @@ plugins {
 }
 
 group 'com.sprain6628'
-version '1.0.0-SNAPSHOT'
+version '1.0.0'
 
 repositories {
     mavenCentral()
@@ -58,6 +58,10 @@ jlink {
     launcher {
         name = project.name
 
+    }
+    jpackage {
+        installerType = "exe" // Windows 실행 파일 (macOS는 dmg, Linux는 deb/rpm)
+        icon = file("src/main/resources/image/background adder.ico") // 아이콘 파일 경로 설정
     }
 }
 
