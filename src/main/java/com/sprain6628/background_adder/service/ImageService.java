@@ -5,9 +5,9 @@ import javafx.scene.image.Image;
 import java.io.File;
 
 public interface ImageService {
-    Image convert(File file);
+    Image convert(File file) throws Exception;
 
-    File addBackground(File file);
+    File addBackground(File file) throws Exception;
 
     String getExtension();
 }

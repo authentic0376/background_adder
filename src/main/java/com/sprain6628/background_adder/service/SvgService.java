@@ -4,6 +4,7 @@ package com.sprain6628.background_adder.service;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.image.Image;
 import org.apache.batik.anim.dom.SAXSVGDocumentFactory;
+import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.PNGTranscoder;
@@ -11,16 +12,11 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.*;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,17 +26,30 @@ public class SvgService implements ImageService {
     private static final Logger LOGGER = Logger.getLogger(SvgService.class.getName());
 
     @Override
-    public Image convert(File file) {
+    public Image convert(File file) throws Exception {
         LOGGER.log(Level.FINE, "convert start");
+
+        float[] svgSize = new float[0];
+
         try {
-            float[] svgSize = getSvgSize(file);
-            BufferedImage bufferedImage = transcodeSvgToPng(file.toURI().toString(), svgSize);
-            LOGGER.log(Level.FINE, "convert end");
-            return SwingFXUtils.toFXImage(bufferedImage, null);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "SVG 변환 중 오류 발생", e);
-            return null;
+            svgSize = getSvgSize(file);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error while getting size of the svg file");
+            throw e;
         }
+
+        BufferedImage bufferedImage = null;
+
+        try {
+            bufferedImage = transcodeSvgToPng(file.toURI().toString(), svgSize);
+            LOGGER.log(Level.FINE, "convert succeed");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Convert failed");
+            throw e;
+        }
+
+        LOGGER.log(Level.FINE, "convert end");
+        return SwingFXUtils.toFXImage(bufferedImage, null);
     }
 
     private BufferedImage transcodeSvgToPng(String svgUri, float[] size) throws Exception {
@@ -49,40 +58,53 @@ public class SvgService implements ImageService {
         transcoder.addTranscodingHint(PNGTranscoder.KEY_HEIGHT, size[1]);
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        transcoder.transcode(new TranscoderInput(svgUri), new TranscoderOutput(outputStream));
-
-        return javax.imageio.ImageIO.read(new ByteArrayInputStream(outputStream.toByteArray()));
-    }
-
-    private static float[] getSvgSize(File file) {
-        LOGGER.log(Level.FINE, "Start getSvgSize");
         try {
-            Document document = loadSvgDocument(file);
-            Element svgElement = document.getDocumentElement();
-
-            float width = parseDimension(svgElement.getAttribute("width"));
-            float height = parseDimension(svgElement.getAttribute("height"));
-
-            if (width <= 0 || height <= 0) {
-                String viewBox = svgElement.getAttribute("viewBox");
-                String[] values = viewBox.split(" ");
-                if (values.length == 4) {
-                    width = Float.parseFloat(values[2]);
-                    height = Float.parseFloat(values[3]);
-                }
-            }
-
-            if (width <= 0 || height <= 0) {
-                throw new IllegalArgumentException("유효한 width/height 정보를 찾을 수 없습니다.");
-            }
-            return new float[]{width, height};
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "SVG 크기 추출 중 오류 발생", e);
+            transcoder.transcode(new TranscoderInput(svgUri), new TranscoderOutput(outputStream));
+        } catch (TranscoderException e) {
+            LOGGER.log(Level.SEVERE, "Error while transcode");
+            throw e;
         }
-        return null;
+
+        try {
+            return javax.imageio.ImageIO.read(new ByteArrayInputStream(outputStream.toByteArray()));
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error while image read");
+            throw e;
+        }
     }
 
-    private static Document loadSvgDocument(File file) throws Exception {
+    private static float[] getSvgSize(File file) throws Exception {
+        LOGGER.log(Level.FINE, "Start getSvgSize");
+
+        Document document = null;
+        try {
+            document = loadSvgDocument(file);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error while loading svg file");
+            throw e;
+        }
+        Element svgElement = document.getDocumentElement();
+
+        float width = parseDimension(svgElement.getAttribute("width"));
+        float height = parseDimension(svgElement.getAttribute("height"));
+
+        if (width <= 0 || height <= 0) {
+            String viewBox = svgElement.getAttribute("viewBox");
+            String[] values = viewBox.split(" ");
+            if (values.length == 4) {
+                width = Float.parseFloat(values[2]);
+                height = Float.parseFloat(values[3]);
+            }
+        }
+
+        if (width <= 0 || height <= 0) {
+            throw new Exception("Can't find valid 'width/height' information");
+        }
+
+        return new float[]{width, height};
+    }
+
+    private static Document loadSvgDocument(File file) throws IOException {
         return new SAXSVGDocumentFactory(null).createDocument(file.toURI().toString());
     }
 
@@ -95,20 +117,36 @@ public class SvgService implements ImageService {
     }
 
     @Override
-    public File addBackground(File file) {
+    public File addBackground(File file) throws Exception {
         LOGGER.log(Level.FINE, "Add Background start");
+
+        Document document = null;
         try {
-            Document document = loadSvgDocument(file);
-            float[] size = getSvgSize(file);
-            assert size != null;
-            addWhiteBackground(document, size);
-            File tempFile = saveToTempFile(document);
-            LOGGER.log(Level.FINE, "Add Background end");
-            return tempFile;
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "SVG 배경 추가 중 오류 발생", e);
-            return null;
+            document = loadSvgDocument(file);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error while load svg document");
+            throw e;
         }
+
+        float[] size = null;
+        try {
+            size = getSvgSize(file);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error while get svg size");
+            throw e;
+        }
+
+        addWhiteBackground(document, size);
+        File tempFile = null;
+        try {
+            tempFile = saveToTempFile(document);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error while save document to temp file");
+            throw e;
+        }
+
+        LOGGER.log(Level.FINE, "Add Background end");
+        return tempFile;
     }
 
     private void addWhiteBackground(Document document, float[] size) {
@@ -129,13 +167,37 @@ public class SvgService implements ImageService {
     }
 
     private File saveToTempFile(Document document) throws Exception {
-        File tempFile = File.createTempFile("svg_with_background", "." + getExtension());
+        File tempFile = null;
+        try {
+            tempFile = File.createTempFile("svg_with_background", "." + getExtension());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Exception while create temp file");
+            throw e;
+        }
+
         try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Transformer transformer = null;
+            try {
+                transformer = TransformerFactory.newInstance().newTransformer();
+            } catch (TransformerConfigurationException e) {
+                LOGGER.log(Level.SEVERE, "Exception while create new instance of transformer");
+                throw e;
+            }
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty(OutputKeys.METHOD, "xml");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "no");
-            transformer.transform(new DOMSource(document), new StreamResult(outputStream));
+            try {
+                transformer.transform(new DOMSource(document), new StreamResult(outputStream));
+            } catch (TransformerException e) {
+                LOGGER.log(Level.SEVERE, "Exception while transform");
+                throw e;
+            }
+        } catch (FileNotFoundException e) {
+            LOGGER.log(Level.SEVERE, "Temp file not found");
+            throw e;
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Exception while reading temp file");
+            throw e;
         }
         return tempFile;
     }

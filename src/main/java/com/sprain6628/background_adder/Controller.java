@@ -10,6 +10,7 @@ import javafx.scene.layout.Region;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Singleton
@@ -45,7 +46,13 @@ public class Controller implements ControlCallback {
                             if (droppedFile == null) return null;
 
                             interactor.setOriginalFileName(droppedFile);
-                            return interactor.convert(droppedFile);
+                            try {
+                                return interactor.convert(droppedFile);
+                            } catch (Exception e) {
+                                LOGGER.log(Level.SEVERE, "Exception while convert dropped file to FX Image");
+                                exceptionModel.setLeftConvertException(new Exception("An error occurred while rendering dropped image", e));
+                                return null;
+                            }
                         },
                         imageModel.droppedFileProperty()
                 )
@@ -54,7 +61,16 @@ public class Controller implements ControlCallback {
         // Dropped File -> Processed File
         imageModel.processedFileProperty().bind(
                 Bindings.createObjectBinding(
-                        () -> interactor.addBackground(imageModel.getDroppedFile()),
+                        () -> {
+                            File file = imageModel.getDroppedFile();
+                            try {
+                                return interactor.addBackground(file);
+                            } catch (Exception e) {
+                                LOGGER.log(Level.SEVERE, "Exception while add background");
+                                exceptionModel.setAddBackgroundException(new Exception("An error occurred while adding background"));
+                                return null;
+                            }
+                        },
                         imageModel.droppedFileProperty()
                 )
         );
@@ -62,7 +78,17 @@ public class Controller implements ControlCallback {
         // Processed File -> Processed Image
         imageModel.processedImageProperty().bind(
                 Bindings.createObjectBinding(
-                        () -> interactor.convert(imageModel.getProcessedFile()),
+                        () -> {
+                            File file = imageModel.getProcessedFile();
+                            try {
+                                return interactor.convert(file);
+                            } catch (Exception e) {
+                                LOGGER.log(Level.SEVERE, "Exception while convert processed file to FX Image");
+                                exceptionModel.setRightConvertException(new Exception("An error occurred while rendering processed image", e));
+                                return null;
+                            }
+
+                        },
                         imageModel.processedFileProperty()
                 )
         );

@@ -7,8 +7,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class PngService implements ImageService {
+    private static final Logger LOGGER = Logger.getLogger(PngService.class.getName());
+
     @Override
     public Image convert(File file) {
         return new Image(file.toURI().toString());
@@ -20,22 +24,35 @@ public class PngService implements ImageService {
     }
 
     @Override
-    public File addBackground(File file) {
+    public File addBackground(File file) throws Exception {
+        BufferedImage originalImage = null;
         try {
-            BufferedImage originalImage = readImage(file);
-            BufferedImage processedImage = addWhiteBackground(originalImage);
-
-            File tempFile = File.createTempFile("temp_image_", "." + getExtension());
-
-            ImageIO.write(processedImage, getExtension(), tempFile);
-
-            tempFile.deleteOnExit();
-
-            return tempFile;
-
+            originalImage = readImage(file);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            LOGGER.log(Level.SEVERE, "Exception while read image");
+            throw e;
         }
+        BufferedImage processedImage = addWhiteBackground(originalImage);
+
+        File tempFile = null;
+        try {
+            tempFile = File.createTempFile("temp_image_", "." + getExtension());
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Exception while create temp file");
+            throw e;
+        }
+
+        try {
+            ImageIO.write(processedImage, getExtension(), tempFile);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Exception while write image");
+            throw e;
+        }
+
+        tempFile.deleteOnExit();
+
+        return tempFile;
+
     }
 
     private BufferedImage addWhiteBackground(BufferedImage originalImage) {

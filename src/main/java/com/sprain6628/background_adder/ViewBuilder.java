@@ -2,6 +2,7 @@ package com.sprain6628.background_adder;
 
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
+import com.sprain6628.background_adder.model.ExceptionModel;
 import com.sprain6628.background_adder.model.ImageModel;
 import com.sprain6628.background_adder.util.FileUtil;
 import javafx.beans.binding.Bindings;
@@ -26,12 +27,16 @@ public class ViewBuilder implements Builder<Region> {
 
     private final ImageModel model;
     private final ControlCallback callback;
+    private final ExceptionModel exceptionModel;
     private static final Logger LOGGER = Logger.getLogger(ViewBuilder.class.getName());
 
     @Inject
-    public ViewBuilder(ImageModel model, ControlCallback callback) {
+    public ViewBuilder(ImageModel model, ControlCallback callback, ExceptionModel exceptionModel) {
         this.model = model;
         this.callback = callback;
+        this.exceptionModel = exceptionModel;
+
+        bind();
     }
 
     @Override
@@ -59,6 +64,18 @@ public class ViewBuilder implements Builder<Region> {
         bottomBox.getChildren().add(saveButton);
         root.setBottom(bottomBox);
         return root;
+    }
+
+    private void bind() {
+        exceptionModel.leftConvertExceptionProperty().addListener((observableValue, old, newException) -> {
+            showAlert(newException.getMessage(), "Error");
+        });
+        exceptionModel.rightConvertExceptionProperty().addListener((observableValue, old, newException) -> {
+            showAlert(newException.getMessage(), "Error");
+        });
+        exceptionModel.addBackgroundExceptionProperty().addListener((observableValue, old, newException) -> {
+            showAlert(newException.getMessage(), "Error");
+        });
     }
 
     private Pane createRightPane() {
