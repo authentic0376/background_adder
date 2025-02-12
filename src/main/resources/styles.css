@@ -1,0 +1,31 @@
+/* 이미지가 표시되는 컨테이너 스타일 */
+.image-pane {
+    -fx-background-color: #f4f4f4;
+    -fx-border-color: #ddd;
+    -fx-border-width: 1px;
+    -fx-alignment: center;
+}
+
+/* Save 버튼 스타일 */
+.save-button {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+}
+
+.save-button:hover {
+    -fx-background-color: #45a049;
+
+}
+
+.checkerboard-pattern {
+    -fx-background-image: url("image/checkboard.png");
+    -fx-background-repeat: repeat;
+    -fx-background-position: center;
+}
+
+.bottom-box {
+    -fx-padding: 10px 0 0 0;
+}
