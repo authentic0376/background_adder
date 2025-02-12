@@ -67,15 +67,15 @@ public class ViewBuilder implements Builder<Region> {
     }
 
     private void bind() {
-        exceptionModel.leftConvertExceptionProperty().addListener((observableValue, old, newException) -> {
-            showAlert(newException.getMessage(), "Error");
-        });
-        exceptionModel.rightConvertExceptionProperty().addListener((observableValue, old, newException) -> {
-            showAlert(newException.getMessage(), "Error");
-        });
-        exceptionModel.addBackgroundExceptionProperty().addListener((observableValue, old, newException) -> {
-            showAlert(newException.getMessage(), "Error");
-        });
+        exceptionModel.leftConvertExceptionProperty().addListener(
+                (observableValue, old, newException) -> showAlert(newException.getMessage(), "Error")
+        );
+        exceptionModel.rightConvertExceptionProperty().addListener(
+                (observableValue, old, newException) -> showAlert(newException.getMessage(), "Error")
+        );
+        exceptionModel.addBackgroundExceptionProperty().addListener(
+                (observableValue, old, newException) -> showAlert(newException.getMessage(), "Error")
+        );
     }
 
     private Pane createRightPane() {
@@ -181,10 +181,6 @@ public class ViewBuilder implements Builder<Region> {
 
         });
 
-    }
-
-    private void showAlert() {
-        showAlert("이것은 JavaFX에서 띄운 팝업입니다.", "팝업 헤더", "정보");
     }
 
     private void showAlert(String text, String header) {

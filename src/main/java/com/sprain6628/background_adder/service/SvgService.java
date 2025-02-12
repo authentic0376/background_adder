@@ -29,7 +29,7 @@ public class SvgService implements ImageService {
     public Image convert(File file) throws Exception {
         LOGGER.log(Level.FINE, "convert start");
 
-        float[] svgSize = new float[0];
+        float[] svgSize;
 
         try {
             svgSize = getSvgSize(file);
@@ -38,7 +38,7 @@ public class SvgService implements ImageService {
             throw e;
         }
 
-        BufferedImage bufferedImage = null;
+        BufferedImage bufferedImage;
 
         try {
             bufferedImage = transcodeSvgToPng(file.toURI().toString(), svgSize);
@@ -76,7 +76,7 @@ public class SvgService implements ImageService {
     private static float[] getSvgSize(File file) throws Exception {
         LOGGER.log(Level.FINE, "Start getSvgSize");
 
-        Document document = null;
+        Document document;
         try {
             document = loadSvgDocument(file);
         } catch (IOException e) {
@@ -120,7 +120,7 @@ public class SvgService implements ImageService {
     public File addBackground(File file) throws Exception {
         LOGGER.log(Level.FINE, "Add Background start");
 
-        Document document = null;
+        Document document;
         try {
             document = loadSvgDocument(file);
         } catch (IOException e) {
@@ -128,7 +128,7 @@ public class SvgService implements ImageService {
             throw e;
         }
 
-        float[] size = null;
+        float[] size;
         try {
             size = getSvgSize(file);
         } catch (IOException e) {
@@ -137,7 +137,7 @@ public class SvgService implements ImageService {
         }
 
         addWhiteBackground(document, size);
-        File tempFile = null;
+        File tempFile;
         try {
             tempFile = saveToTempFile(document);
         } catch (IOException e) {
@@ -167,7 +167,7 @@ public class SvgService implements ImageService {
     }
 
     private File saveToTempFile(Document document) throws Exception {
-        File tempFile = null;
+        File tempFile;
         try {
             tempFile = File.createTempFile("svg_with_background", "." + getExtension());
         } catch (IOException e) {
@@ -176,7 +176,7 @@ public class SvgService implements ImageService {
         }
 
         try (FileOutputStream outputStream = new FileOutputStream(tempFile)) {
-            Transformer transformer = null;
+            Transformer transformer;
             try {
                 transformer = TransformerFactory.newInstance().newTransformer();
             } catch (TransformerConfigurationException e) {

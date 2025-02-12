@@ -3,7 +3,7 @@ package com.sprain6628.background_adder;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.sprain6628.background_adder.config.CustomModule;
-import com.sprain6628.background_adder.config.LoggingConfig;
+import com.sprain6628.background_adder.config.Config;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
@@ -33,7 +33,7 @@ public class BackgroundAdderApp extends Application {
     }
 
     public static void main(String[] args) {
-        LoggingConfig.setupLogging();
+        Config.setupLogging();
         launch(args);
     }
 }

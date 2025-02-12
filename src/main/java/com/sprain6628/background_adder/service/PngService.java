@@ -25,7 +25,7 @@ public class PngService implements ImageService {
 
     @Override
     public File addBackground(File file) throws Exception {
-        BufferedImage originalImage = null;
+        BufferedImage originalImage;
         try {
             originalImage = readImage(file);
         } catch (IOException e) {
@@ -34,7 +34,7 @@ public class PngService implements ImageService {
         }
         BufferedImage processedImage = addWhiteBackground(originalImage);
 
-        File tempFile = null;
+        File tempFile;
         try {
             tempFile = File.createTempFile("temp_image_", "." + getExtension());
         } catch (IOException e) {
