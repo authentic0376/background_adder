@@ -116,7 +116,8 @@ public class ViewBuilder implements Builder<Region> {
         saveButton.setOnAction(
                 (e) -> {
                     try {
-                        this.callback.save();
+                        File file = this.callback.save();
+                        showAlert(String.format("File: %s", file.getName()), "File saved!");
                     } catch (FileNotFoundException err) {
                         showAlert("Drop the image file first", "Error");
                     } catch (IOException err) {

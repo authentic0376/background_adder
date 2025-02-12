@@ -31,8 +31,8 @@ public class Interactor {
         initImageServiceMap();
     }
 
-    public void save(File tempFile) throws IOException {
-        fileService.save(tempFile);
+    public File save(File tempFile) throws IOException {
+        return fileService.save(tempFile);
     }
 
     private void initImageServiceMap() {

@@ -95,10 +95,10 @@ public class Controller implements ControlCallback {
     }
 
     @Override
-    public void save() throws IOException {
+    public File save() throws IOException {
         File tempFile = imageModel.getProcessedFile();
         if (tempFile == null)
             throw new FileNotFoundException();
-        interactor.save(tempFile);
+        return interactor.save(tempFile);
     }
 }
